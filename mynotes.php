@@ -1,5 +1,4 @@
-﻿
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
     <!-- Required meta tags -->
@@ -8,11 +7,22 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.css" />
-  <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
     <title>Notes</title>
+    <style>
+        .image-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .image-container img {
+            width: 100px;
+            height: 50px;
+        }
+    </style>
 </head>
 <body>
- <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">INotes</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
@@ -26,70 +36,70 @@
                     <li class="nav-item">
                         <a class="nav-link active" href="mynotes.php">View</a>
                     </li>
-                    
                 </ul>
             </div>
         </div>
     </nav>
-   <?php
-   include 'data.php';
-   ?>
-    <div class="container" style="padding-top:1em ;" >
-        <h2 style="margin-bottom:1em">Registered Users</h2>
     <?php
-$query = "SELECT * FROM `notes`";
-$res = mysqli_query($conn, $query);
-
-if ($res) {
+    include 'data.php';
     ?>
-     <table   id="mytable" class="table">
-       <thead >
-         <tr style="margin-top:1em">
-            <th scope="col">ID</th>
-            <th scope="col">First Name</th>
-            <th scope="col">Second Name</th>
-            <th scope="col">Phone</th>
-            <th scope="col">Gender</th>
-            <th scope="col">Image</th>
-            <th scope="col">Action</th>
-        </tr>
-     </thead>
-     <tbody>
+    <div class="container" style="padding-top:1em ;">
+        <h2 style="margin-bottom:1em">Registered Users</h2>
         <?php
-    $i=1;
-    while ($ar = mysqli_fetch_assoc($res)) {
+        $query = "SELECT * FROM `notes`";
+        $res = mysqli_query($conn, $query);
+
+        if ($res) {
+            ?>
+            <table id="mytable" class="table">
+                <thead>
+                    <tr style="margin-top:1em">
+                        <th scope="col">ID</th>
+                        <th scope="col">First Name</th>
+                        <th scope="col">Second Name</th>
+                        <th scope="col">Phone</th>
+                        <th scope="col">Gender</th>
+                        <th scope="col">Images</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $i = 1;
+                    while ($ar = mysqli_fetch_assoc($res)) {
+                        $images = $ar['Image'];
+                        $new_arr = unserialize($images);
+                        ?>
+                        <tr>
+                            <th scope="row"><?php echo $i ?></th>
+                            <td><?php echo $ar['Fname'] ?></td>
+                            <td><?php echo $ar['Sname'] ?></td>
+                            <td><?php echo $ar['Phone'] ?></td>
+                            <td><?php echo $ar['Address'] ?></td>
+                            <td>
+                                <div class="image-container">
+                                    <?php foreach ($new_arr as $arr) { ?>
+                                        <img src="uploads/<?php echo $arr ?>" alt="<?php echo $arr ?>">
+                                    <?php } ?>
+                                </div>
+                            </td>
+                            <td>
+                                <a class="btn btn-danger" href="delete.php?upid=<?php echo $ar['id'] ?>">Delete</a>
+                                <a class="btn btn-success" href="edit.php?upid=<?php echo $ar['id'] ?>">Update</a>
+                            </td>
+                        </tr>
+                        <?php
+                        $i = $i + 1;
+                    }
+                    ?>
+                </tbody>
+            </table>
+            <?php
+        } else {
+            // Handle query execution failure, display an error message, or log the error.
+            echo 'Error executing the query: ' . mysqli_error($conn);
+        }
         ?>
-        <tr>
-                <th scope="row"><?php echo $i ?></th>
-                <td><?php echo $ar['Fname'] ?></td>
-                <td><?php echo $ar['Sname'] ?></td>
-                <td><?php echo $ar['Phone'] ?></td>
-                <td><?php echo $ar['Address'] ?></td>
-                <td><img src="uploads/<?php echo $ar['Image'] ?>" alt="<?php echo $ar['Image'] ?>" width="100" height="50"></td>
-                <td>
-                <a class="btn btn-danger" href="delete.php?upid=<?php echo $ar['id'] ?>">Delete</a>
-                <a class="btn btn-success" href="edit.php?upid=<?php echo $ar['id'] ?>">Update</a>
-                </td>
-        </tr>
-       
-        <?php
-         $i=$i+1;
-    }
-    ?>
-    </tbody>
-    </table>
-  <?php
-} else {
-    // Handle query execution failure, display an error message, or log the error.
-    echo 'Error executing the query: ' . mysqli_error($conn);
-}
-
-?>
-
-
-
-
-   
     </div>
     <!-- Optional JavaScript; choose one of the two! -->
     <!-- Option 1: Bootstrap Bundle with Popper -->
@@ -102,11 +112,7 @@ if ($res) {
     -->
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.js"></script>
     <script>
-
-let table = new DataTable('#mytable');</script>
-
-
-
-
+        let table = new DataTable('#mytable');
+    </script>
 </body>
 </html>

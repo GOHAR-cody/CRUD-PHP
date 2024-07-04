@@ -9,14 +9,21 @@ if ($_SERVER['REQUEST_METHOD']=='POST' && isset($_POST['add'])) {
     if(empty($fname) || empty($sname) || empty($phone) || empty($gender) ){
         $msg = "Plz Fill all Fields";}
     else{ 
+   $new= [];
+   foreach($image as $key => $im){
    $arr = array('png', 'jpeg', 'jpg');
-   $exe = strtolower(pathinfo($image, PATHINFO_EXTENSION));
+   $exe = strtolower(pathinfo($im, PATHINFO_EXTENSION));
    if(in_array($exe, $arr)){
    $pic= rand(100,500).".".$exe;
-   $sql= "INSERT INTO `notes`(`Fname`,`Sname`,`Address`,`Phone`, `Image`) VALUES ('$fname','$sname', '$gender','$phone','$pic')";
+   if (move_uploaded_file($_FILES['imageFile']['tmp_name'][$key], "uploads/" . $pic)) {
+    $new[] = $pic;
+}
+   }
+}
+   $imageSerial = serialize($new);
+   $sql= "INSERT INTO `notes`(`Fname`,`Sname`,`Address`,`Phone`, `Image`) VALUES ('$fname','$sname', '$gender','$phone','$imageSerial')";
    $result= mysqli_query($conn, $sql);
   if($result){
-    move_uploaded_file($_FILES['imageFile']['tmp_name'],"uploads/".$pic);
      $message= "Data inserted Sucessfully";
 
     }
@@ -25,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD']=='POST' && isset($_POST['add'])) {
     }
 }
 }
-}
+
 
 ?>
 <!doctype html>
@@ -149,7 +156,7 @@ if ($_SERVER['REQUEST_METHOD']=='POST' && isset($_POST['add'])) {
                 <label for="imageFile" class="form-label"><div class="uploadiv">
                     <img src="asset/img/upload.png" width="120" height="120" style="margin-top:2em">
                 </div></label>
-                <input style="display: none;" type="file" class="form-control" id="imageFile" name="imageFile" accept=".jpg,.jpeg,.png,.gif" required>
+                <input style="display: none;" type="file" class="form-control" id="imageFile" name="imageFile[]" accept=".jpg,.jpeg,.png,.gif" multiple required>
                 
             </div>
             <div class="mb-3">
